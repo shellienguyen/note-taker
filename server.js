@@ -24,6 +24,17 @@ app.use( morganLogger( 'dev' ));
 
 /////////////////////////////////////////////////////////////
 
+// ----------  Setup HTML Routes  ----------
+// Locate and read the file's content, then send it back to the client
+app.get( '/notes', ( req, res ) => {
+   res.sendFile( path.join( __dirname, '/public/notes.html' ));
+});
+
+app.get( '*', ( req, res ) => {
+   res.sendFile( path.join( __dirname, '/pulic/index.html' ));
+});
+// -----------------------------------------
+
 // Listen for requests
 app.listen( PORT, () => {
    console.log( `API server now on port ${PORT}!` );
