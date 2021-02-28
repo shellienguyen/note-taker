@@ -3,11 +3,11 @@ const fs = require( 'fs' );
 const express = require( 'express' );
 const morganLogger = require( 'morgan' );
 const path = require( 'path' );
-const dbJsonNotes = require( './db/db.json' );
+const dbJsonPath = 'db/db.json'
 
 // Instantiate the server
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 // Setup middleware to parse json and urlendoded for POST requests
 app.use( express.urlencoded({ extended: true }));
@@ -25,22 +25,27 @@ app.use( morganLogger( 'dev' ));
 
 /////////////////////////////////////////////////////////////
 
+app.get( '/api/notes', ( req, res ) => {
+   fs.readFile( dbJsonPath, 'utf8', ( err, notes ) => {
+      if ( err ) {
+         console.log( err );
+         return;
+      };
 
-// Display notes
-app.get('/api/notes', ( req, res ) => {
-   console.log( 'app.get notes' );
-   res.json( dbJsonNotes );
+      res.json( JSON.parse( notes ));
+   });
 });
 
 
 // Posting new notes to db.json
 app.post( '/api/notes', ( req, res ) => {
    const newNote = req.body;
-   console.log( 'newNote:' );
+   console.log( 'Inside app.post, printing newNote:' );
    console.log( newNote );
    let notesArr = [];
 
-   fs.readFile( path.join( __dirname + "/db/db.json" ), "utf8", ( err, notesData ) => {
+   // Pull JSON file
+   fs.readFile( path.join( __dirname + '/' + dbJsonPath ), "utf8", ( err, notesData ) => {
       if ( err ) {
          return console.log( err );
       };
@@ -51,20 +56,51 @@ app.post( '/api/notes', ( req, res ) => {
       }
       // If the notes file is not empty, JSON parse the data into the array first then add new note
       else {
-         console.log( 'notesData: ' );
-         console.log( notesData );
          notesArr = JSON.parse( notesData );
          notesArr.push({ 'id': notesArr.length, 'title': newNote.title, 'text': newNote.text });
       };
 
       // Update notes data file with data from notes array
-      fs.writeFile(( path.join( __dirname + '/db/db.json' )), JSON.stringify( notesArr, null, 2 ), ( error ) => {
+      fs.writeFile(( path.join( __dirname + '/' + dbJsonPath )), JSON.stringify( notesArr, null, 2 ), ( error ) => {
          if ( error ) { return console.log( error ); }
 
          res.json( notesArr );
       });
    });
 });
+
+
+
+// Delete user selected note from db.json
+app.delete( '/api/notes/:id', ( req, res ) => {
+   //const newNote = req.body;
+   const id = req.params.id;
+   let notesArr = [];
+
+   // Pull JSON file
+   fs.readFile( path.join( __dirname + '/' + dbJsonPath ), 'utf8', ( err, data ) => {
+      if ( err ) {
+         return console.log( err );
+      };
+
+      //console.log( data )
+      notesArr = JSON.parse( data );
+
+      // Filter out the id for the note to be deleted
+      notesArr = notesArr.filter( function( object ) {
+         return object.id != id;
+      });
+
+      // Update db.json
+      fs.writeFile(( path.join( __dirname + '/' + dbJsonPath )), JSON.stringify( notesArr ), ( error ) => {
+         if ( error ) { return console.log( error ); };
+
+         console.log( 'inside writeFile in app.delete:')
+         res.json( notesArr );
+      });
+   });
+});
+
 
 // ----------  Setup HTML Routes  ----------
 // Locate and read the file's content, then send it back to the client
