@@ -10,7 +10,7 @@ Note Taker is deployed on Heroku.
 
 ## Usage:
 
-Follow these instrustionc to use this application:
+Follow these instructions to use this application:
 
 1. Navigate to https://snguyen-note-taker.herokuapp.com/ on a browser.
 2. Click on the "Get Started" button to be taken to the notes page.
