@@ -70,7 +70,6 @@ app.post( '/api/notes', ( req, res ) => {
 
 // Delete user selected note from db.json
 app.delete( '/api/notes/:id', ( req, res ) => {
-   //const newNote = req.body;
    const id = req.params.id;
    let notesArr = [];
 
