@@ -40,8 +40,6 @@ app.get( '/api/notes', ( req, res ) => {
 // Posting new notes to db.json
 app.post( '/api/notes', ( req, res ) => {
    const newNote = req.body;
-   console.log( 'Inside app.post, printing newNote:' );
-   console.log( newNote );
    let notesArr = [];
 
    // Pull JSON file
@@ -54,7 +52,7 @@ app.post( '/api/notes', ( req, res ) => {
       if ( notesData === '' ) {
          notesArr.push({ 'id': 0, 'title': newNote.title, 'text': newNote.text });
       }
-      // If the notes file is not empty, JSON parse the data into the array first then add new note
+      // If the notes file is not empty, JSON parse the notes data into the array first then add new note
       else {
          notesArr = JSON.parse( notesData );
          notesArr.push({ 'id': notesArr.length, 'title': newNote.title, 'text': newNote.text });
@@ -70,7 +68,6 @@ app.post( '/api/notes', ( req, res ) => {
 });
 
 
-
 // Delete user selected note from db.json
 app.delete( '/api/notes/:id', ( req, res ) => {
    //const newNote = req.body;
@@ -78,13 +75,12 @@ app.delete( '/api/notes/:id', ( req, res ) => {
    let notesArr = [];
 
    // Pull JSON file
-   fs.readFile( path.join( __dirname + '/' + dbJsonPath ), 'utf8', ( err, data ) => {
+   fs.readFile( path.join( __dirname + '/' + dbJsonPath ), 'utf8', ( err, notesData ) => {
       if ( err ) {
          return console.log( err );
       };
 
-      //console.log( data )
-      notesArr = JSON.parse( data );
+      notesArr = JSON.parse( notesData );
 
       // Filter out the id for the note to be deleted
       notesArr = notesArr.filter( function( object ) {
@@ -95,7 +91,6 @@ app.delete( '/api/notes/:id', ( req, res ) => {
       fs.writeFile(( path.join( __dirname + '/' + dbJsonPath )), JSON.stringify( notesArr ), ( error ) => {
          if ( error ) { return console.log( error ); };
 
-         console.log( 'inside writeFile in app.delete:')
          res.json( notesArr );
       });
    });
