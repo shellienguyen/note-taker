@@ -50,7 +50,7 @@ app.post( '/api/notes', ( req, res ) => {
 
       // If the notes file is empty, then add the new note
       if ( notesData === '' ) {
-         notesArr.push({ 'id': 0, 'title': newNote.title, 'text': newNote.text });
+         notesArr.push({ 'id': 1, 'title': newNote.title, 'text': newNote.text });
       }
       // If the notes file is not empty, JSON parse the notes data into the array first then add new note
       else {
@@ -70,7 +70,7 @@ app.post( '/api/notes', ( req, res ) => {
 
 // Delete user selected note from db.json
 app.delete( '/api/notes/:id', ( req, res ) => {
-   const id = req.params.id;
+   const idToDelete = req.params.id;
    let notesArr = [];
 
    // Pull JSON file
@@ -82,9 +82,14 @@ app.delete( '/api/notes/:id', ( req, res ) => {
       notesArr = JSON.parse( notesData );
 
       // Filter out the id for the note to be deleted
-      notesArr = notesArr.filter( function( object ) {
-         return object.id != id;
+      notesArr = notesArr.filter( ( object ) => {
+         return object.id != idToDelete; 
       });
+
+      // Re-assign note IDs in the array
+      for ( let i = 1; i < notesArr.length; i++ ) {
+         notesArr[ i ].id = i;
+      };
 
       // Update db.json
       fs.writeFile(( path.join( __dirname + '/' + dbJsonPath )), JSON.stringify( notesArr ), ( error ) => {
